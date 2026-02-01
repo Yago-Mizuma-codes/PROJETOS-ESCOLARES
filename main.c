@@ -1,0 +1,325 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <conio.h>
+#define sala 40
+typedef struct {
+char nome[32];
+char identificacao[12];
+char RA[12];
+float np1;
+float np2;
+float nt;
+float NM;
+char frequencia[21];
+} ALUNO ;
+char exibeMenu(char**o, int x){
+for (int i=0;i<x;i++) printf("%s \n",*(o+i));
+
+}
+void ordenaalunos(ALUNO *vn, int tamanho) {
+    // Implementação do Insertion Sort
+    for (int i = 1; i < tamanho; i++) {
+        ALUNO chave = vn[i];
+        int j = i - 1;
+
+        // Move elementos maiores que a chave uma posição para frente
+        while (j >= 0 && strcmp(vn[j].nome, chave.nome) > 0) {
+            vn[j + 1] = vn[j];
+            j = j - 1;
+        }
+        vn[j + 1] = chave;
+    }
+}
+
+void novoAluno(ALUNO* vn, int* tamanho, int aulasDadas) {
+    getchar();
+    int x = *tamanho;
+    system("cls");
+
+    if (x >= sala) {
+        printf("classe cheia");
+        getch();
+        return;
+    }
+
+    char aux[20];
+    char auxAux[12];
+
+    printf("Escreva o nome sem acentos:");
+    scanf("%[^\n]", aux);
+
+    ALUNO novato;
+    strcpy(novato.nome, aux);
+    getchar();
+
+    printf("\nEscreva o cpf/rg simples:");
+    scanf("%[1234567890]", auxAux);
+    strncpy(novato.identificacao, auxAux,11);
+    novato.identificacao[11]='\0';
+    getchar();
+
+    printf("\nescreva agora o seu RA:");
+    scanf("%s", auxAux);
+    strcpy(novato.RA, auxAux);
+
+    printf("%s\t%s\t%s\t", novato.nome, novato.identificacao, novato.RA);
+
+    // Inicializa frequência
+    strcpy(novato.frequencia, "--------------------"); // 20 caracteres
+    memset(novato.frequencia, 'N', aulasDadas); // Marca aulas existentes como 'N' (não presente);
+
+    novato.np1 = -1;
+    novato.np2 = -1;
+    novato.nt = -1;
+
+    printf("%s\n", novato.frequencia);
+
+    // Insere o novo aluno no vetor
+    vn[x] = novato;
+    x++;
+
+    // Ordena o vetor com o novo aluno
+    ordenaalunos(vn, x);
+
+    // Atualiza o tamanho
+    *tamanho = x;
+
+    printf("%d:%d", x,aulasDadas);//debug
+    getch();
+    return;
+}
+void nomear(char* nome){
+    system("cls");
+printf("Curso\n");
+printf("1\tComp\n2\tElet\n3\tMeca\n4\tFisi\n");
+char esco;
+esco=getch();
+switch(esco){
+case'1':
+    strcat(nome,"Ecomp");
+    break;
+case'2':
+    strcat(nome,"Eelet");
+    break;
+case'3':
+    strcat(nome,"Emeca");
+    break;
+case'4':
+    strcat(nome,"Lfisi");
+    break;
+default:
+    printf("\n erro");
+    getch();
+    return nomear(nome);
+    break;
+    }
+    printf("do ano de 20");
+    char aux[3];
+    scanf("%s",aux);
+    strcat(nome,aux);
+    return;
+
+}
+void editaAluno(ALUNO *vn,int tamanho){
+    exibeAluno(vn,tamanho);
+    int escolha;
+    int numAluno;
+    char tipo;
+    printf("Qual o numero do aluno deseja modificar?\n");
+    scanf("%d",&escolha);
+    escolha--;
+    numAluno=escolha;
+    ALUNO mudando=*(vn+escolha);
+    printf("o que mudar?\n1-nome\n2-ID\n3-RA\n4-nota da primeira prova \n5-nota da segunda prova\n6-nota do trabalho\n7- frequencia\n");
+    scanf("%d",&escolha);
+    char escolhaS[30];
+    float escolhaF=0;
+    switch (escolha){
+case 1:
+    printf("escolha um novo nome:");
+    scanf(" %[^\n]",&escolhaS);
+    strncpy(mudando.nome,escolhaS,31);
+    mudando.nome[30]="\0";
+    break;
+case 2:
+    printf("insira a nova identificação:");
+    scanf("%29s",&escolhaS);
+    strncpy(mudando.identificacao,escolhaS,11);
+    mudando.nome[11]="\0";
+    break;
+case 3:
+    printf("insira o novo RA:");
+    scanf("%s",escolhaS);
+    strncpy(mudando.RA,escolhaS,11);
+    mudando.nome[11]="\0";
+    break;
+case 4:
+    printf("insira a n1");
+    scanf("%f",&mudando.np1);
+    break;
+case 5:
+    printf("insira a n2");
+    scanf("%f",&mudando.np2);
+    break;
+case 6:
+    printf("insira a nT");
+    scanf("%f",&mudando.nt);
+    break;
+case 7:
+    printf("insira a aula:");
+    scanf("%d",&escolha);
+    printf("insira o novo tipo\n1-Compareceu\n2-Nao compareceu\n3Justificado:");
+    tipo=getch();
+    switch(tipo){
+    case'1':
+        memset(mudando.frequencia+escolha-1,'C',1);
+    case'2':
+        memset(mudando.frequencia+escolha-1,'N',1);
+    case'3':
+        memset(mudando.frequencia+escolha,'J',1);
+    }
+    break;
+default:
+    printf("erro");
+    getch();
+    break;
+    }
+    *(vn+numAluno)=mudando;
+    if (mudando.np1<0 ||mudando.np2<0||mudando.nt<0)return;
+    (vn+numAluno)->NM=((vn+numAluno)->np1+(vn+numAluno)->np2+(vn+numAluno)->nt)/3;
+    printf("%f",(vn+numAluno)->NM);
+    getch();
+    return;}
+void exibeAluno(ALUNO *vn, int tamanho,int aulas){
+    printf("aula:%d\n",aulas+1);
+    for (int contador=0;contador<tamanho;contador++){
+        printf("%d\t%s\t%s\t%s\t%f\t%f\t%f\t%f\n",contador+1,(*(vn+contador)).nome,(*(vn+contador)).RA,(*(vn+contador)).frequencia,(*(vn+contador)).np1,(*(vn+contador)).np2,(*(vn+contador)).nt,(*(vn+contador)).NM);
+    }
+    getch();
+    return;
+}
+
+void salvaClasse(ALUNO*vn, int tamanho,int aulas,char* n){
+    FILE *bin;
+    bin=fopen(n,"wb");
+    if(!bin){
+            printf("houve um erro");
+    exit(1);
+    }
+    printf("arquivo aberto\n");
+    fwrite(&tamanho,sizeof(int),1,bin);
+    printf("tamanho salvo\n");
+    fwrite(&aulas,sizeof(int),1,bin);
+    printf("qtd aulas salvas\n");
+    fwrite(vn,sizeof(ALUNO),tamanho,bin);
+    printf("alunos salvo\n");
+    fclose(bin);
+
+}
+void abreclasse(ALUNO *vn,int*tamanho,int*aulas,char*n){
+FILE *bin;
+bin=fopen(n,"rb");
+if(!bin){
+    printf("Nenhum arquivo identificado.\nCrie um novo");
+    getch();
+    return;
+}
+fread(tamanho,sizeof(int),1,bin);
+fread(aulas,sizeof(int),1,bin);
+fread(vn,sizeof(ALUNO),*tamanho,bin);
+fclose(bin);
+}
+void chamada(ALUNO *vn, int* aulas, int tamanho) {
+    char esc;
+    ALUNO atual;
+
+    if (*aulas >= 20) {//quantidade de aulas
+        return;
+    }
+
+    int contador = 0;
+    while(contador < tamanho) {
+            system("cls");
+            printf("aula %d\n", *aulas + 1);
+            atual = *(vn + contador);
+            printf("%s\n", atual.nome);
+            printf("1\tCompareceu\n2\tFaltou\n");
+
+
+            while ((getchar()) != '\n');
+            esc = getchar();
+
+            switch(esc) {
+        case '1':
+            atual.frequencia[(*aulas)] = 'C';
+            break;
+        case '2':
+            atual.frequencia[(*aulas)] = 'N';
+            break;
+        default:
+            printf("Opcao invalida! Tente novamente.\n");
+            }
+
+            // Atribui de volta ao vetor
+            *(vn + contador) = atual;
+
+        contador++;
+    }
+
+    *aulas = *aulas + 1;
+}
+
+int main()
+{
+    char ** opcoes;
+    int aulas=0;
+    int qtdO=6;
+    int tamanho=0;
+    opcoes=(char**) malloc(qtdO*sizeof(char*));
+    char nome[10]="";
+    nomear(nome);
+    for (int contador=0;contador<qtdO;contador++){
+        *((opcoes+contador))=(char*)malloc(60*sizeof(char));
+    }
+    strcpy(*(opcoes),"1-adicionar aluno");
+    strcpy(*(opcoes+1),"2-editar aluno");
+    strcpy(*(opcoes+2),"3-fazer chamada");
+    strcpy(*(opcoes+3),"4-exibir alunos");
+    strcpy(*(opcoes+4),"5-salvar classe");
+    strcpy(*(opcoes+5),"6-sair");
+    char escolha;
+    ALUNO classe[sala];
+    abreclasse(classe,&tamanho,&aulas,nome);
+    do{
+            system("cls");
+        exibeMenu(opcoes,qtdO);
+        escolha =getch();
+        system("cls");
+
+        switch (escolha){
+    case '1':
+        novoAluno(classe,&tamanho,aulas);
+        break;
+    case '2':
+        editaAluno(classe,tamanho);
+        break;
+    case '3':
+        chamada(classe,&aulas,tamanho);
+        break;
+    case '4':
+        exibeAluno(classe,tamanho,aulas);
+        break;
+    case '5':
+         salvaClasse(classe,tamanho,aulas,nome);
+        break;
+    default:
+        break;
+        }
+
+
+    }
+    while(escolha!='6');
+    printf("tchau");
+    return 0;
+}
